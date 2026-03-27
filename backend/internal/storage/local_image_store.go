@@ -30,7 +30,12 @@ func (s *LocalImageStore) Add(img models.Image) error {
 
 func (s *LocalImageStore) List(tags []string) []models.Image {
 	s.mu.RLock()
-	imagesCopy := append([]models.Image(nil), s.images...)
+	if len(s.images) == 0 {
+		s.mu.RUnlock()
+		return make([]models.Image, 0)
+	}
+	imagesCopy := make([]models.Image, len(s.images))
+	copy(imagesCopy, s.images)
 	s.mu.RUnlock()	
 
 	if(len(tags) == 0) {

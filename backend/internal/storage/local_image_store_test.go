@@ -83,3 +83,11 @@ func TestLocalImageStore_List(t *testing.T) {
 		assert.Len(t, results, 0)
 	})
 }
+
+func TestLocalImageStore_List_Empty(t *testing.T) {
+	store := NewLocalImageStore()
+	results := store.List(nil)
+	
+	assert.NotNil(t, results, "should return empty slice, not nil")
+	assert.Len(t, results, 0)
+}
