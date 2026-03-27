@@ -24,10 +24,7 @@ function ThemedText({
   ...props
 }: ThemedTextProps) {
   return (
-    <Component
-      className={`${variantClasses[variant]} ${className}`}
-      {...props}
-    >
+    <Component className={`${variantClasses[variant]} ${className}`} {...props}>
       {children}
     </Component>
   );

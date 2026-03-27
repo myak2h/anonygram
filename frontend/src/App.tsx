@@ -19,14 +19,18 @@ function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsAtTop(window.scrollY < 100);
+      const atTop = window.scrollY < 100;
+      setIsAtTop(atTop);
+      if (atTop) {
+        setNewImageCount(0);
+      }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleWebSocketMessage = useCallback(
-    (image: typeof images[0]) => {
+    (image: (typeof images)[0]) => {
       addImage(image);
       if (!isAtTop) {
         setNewImageCount((prev) => prev + 1);
@@ -41,12 +45,6 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setNewImageCount(0);
   };
-
-  useEffect(() => {
-    if (isAtTop) {
-      setNewImageCount(0);
-    }
-  }, [isAtTop]);
 
   return (
     <div className="max-w-lg w-full mx-auto min-h-screen">
