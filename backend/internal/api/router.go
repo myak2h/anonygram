@@ -26,5 +26,8 @@ func (s *Server) Routes() http.Handler {
 	fileServer := http.FileServer(http.Dir(s.config.UploadPath))
 	r.Handle("/uploads/*", http.StripPrefix("/uploads/", fileServer))
 
+	// WebSocket route
+	r.Get("/ws", s.hub.HandleWebSocket)
+
 	return r
 }

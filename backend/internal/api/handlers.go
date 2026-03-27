@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+	"log"
 
 	"github.com/google/uuid"
 
@@ -11,19 +12,22 @@ import (
 	"anonygram/internal/storage"
 	"anonygram/internal/config"
 	"anonygram/internal/utils"
+	"anonygram/internal/ws"
 )
 
 type Server struct {
 	imageRepo storage.ImageRepository
 	fileRepo storage.FileRepository
 	config *config.Config
+	hub ws.Broadcaster
 }
 
-func NewServer(imageRepo storage.ImageRepository, fileRepo storage.FileRepository, config *config.Config) *Server {
+func NewServer(imageRepo storage.ImageRepository, fileRepo storage.FileRepository, config *config.Config, hub ws.Broadcaster) *Server {
 	return &Server{
 		imageRepo: imageRepo,
 		fileRepo: fileRepo,
 		config: config,
+		hub: hub,
 	}
 }
 
@@ -78,6 +82,10 @@ func (s *Server) UploadImage(w http.ResponseWriter, r *http.Request) {
 	if err := s.imageRepo.Add(img); err != nil {
 		respondWithError(w, http.StatusInternalServerError, ErrMetadataSaveFailed.Error())
 		return
+	}
+
+	if !s.hub.Broadcast(img) {
+		log.Printf("Failed to broadcast new image: %s", img.ID)
 	}
 
 	respondWithJSON(w, http.StatusCreated, img)

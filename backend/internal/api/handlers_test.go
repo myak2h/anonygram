@@ -19,6 +19,8 @@ import (
 
 )
 
+// Mocks
+
 // ImageRepository Mock
 
 type MockImageRepository struct {
@@ -35,8 +37,6 @@ func (m *MockImageRepository) List(tags []string) []models.Image {
 	return args.Get(0).([]models.Image)
 }
 
-// Mocks
-
 // FileRepository Mock
 
 type MockFileRepository struct {
@@ -46,6 +46,21 @@ type MockFileRepository struct {
 func (m *MockFileRepository) Save(src io.Reader) (string, error) {
 	args := m.Called(src)
 	return args.String(0), args.Error(1)
+}
+
+// Broadcaster Mock
+
+type MockBroadcaster struct {
+	mock.Mock
+}
+
+func (m *MockBroadcaster) Broadcast(img models.Image) bool {
+	args := m.Called(img)
+	return args.Bool(0)
+}
+
+func (m *MockBroadcaster) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	m.Called(w, r)
 }
 
 // Test Helpers
@@ -91,13 +106,15 @@ func TestNewServer(t *testing.T) {
 	imageRepo := &MockImageRepository{}
 	fileRepo := &MockFileRepository{}
 	cfg := testConfig()
+	hub := &MockBroadcaster{}
 
-	server := NewServer(imageRepo, fileRepo, cfg)
+	server := NewServer(imageRepo, fileRepo, cfg, hub)
 
 	assert.NotNil(t, server)
 	assert.Equal(t, imageRepo, server.imageRepo)
 	assert.Equal(t, fileRepo, server.fileRepo)
 	assert.Equal(t, cfg, server.config)
+	assert.Equal(t, hub, server.hub)
 }
 
 func TestServer_ListImages(t *testing.T) {
@@ -105,8 +122,9 @@ func TestServer_ListImages(t *testing.T) {
 		imageRepo := &MockImageRepository{}
 		imageRepo.On("List", mock.Anything).Return([]models.Image{})
 		fileRepo := &MockFileRepository{}
+		hub := &MockBroadcaster{}
 
-		server := NewServer(imageRepo, fileRepo, testConfig())
+		server := NewServer(imageRepo, fileRepo, testConfig(), hub)
 		req, _ := http.NewRequest("GET", "/images", nil)
 		w := httptest.NewRecorder()
 
@@ -126,8 +144,9 @@ func TestServer_ListImages(t *testing.T) {
 		imageRepo := &MockImageRepository{}
 		imageRepo.On("List", []string(nil)).Return(images)
 		fileRepo := &MockFileRepository{}
+		hub := &MockBroadcaster{}
 
-		server := NewServer(imageRepo, fileRepo, testConfig())
+		server := NewServer(imageRepo, fileRepo, testConfig(), hub)
 		req, _ := http.NewRequest("GET", "/images", nil)
 		w := httptest.NewRecorder()
 
@@ -149,8 +168,9 @@ func TestServer_ListImages(t *testing.T) {
 		imageRepo := &MockImageRepository{}
 		imageRepo.On("List", []string{"nature", "sunset"}).Return(images)
 		fileRepo := &MockFileRepository{}
+		hub := &MockBroadcaster{}
 
-		server := NewServer(imageRepo, fileRepo, testConfig())
+		server := NewServer(imageRepo, fileRepo, testConfig(), hub)
 		req, _ := http.NewRequest("GET", "/images?tag=nature&tag=sunset", nil)
 		w := httptest.NewRecorder()
 
@@ -166,8 +186,9 @@ func TestServer_UploadImage(t *testing.T) {
 	t.Run("missing title", func(t *testing.T) {
 		imageRepo := &MockImageRepository{}
 		fileRepo := &MockFileRepository{}
+		hub := &MockBroadcaster{}
 
-		server := NewServer(imageRepo, fileRepo, testConfig())
+		server := NewServer(imageRepo, fileRepo, testConfig(), hub)
 		req, _ := createMultipartRequest(map[string]string{}, "test.jpg", []byte("fake image"))
 		w := httptest.NewRecorder()
 
@@ -180,8 +201,9 @@ func TestServer_UploadImage(t *testing.T) {
 	t.Run("missing image file", func(t *testing.T) {
 		imageRepo := &MockImageRepository{}
 		fileRepo := &MockFileRepository{}
+		hub := &MockBroadcaster{}
 
-		server := NewServer(imageRepo, fileRepo, testConfig())
+		server := NewServer(imageRepo, fileRepo, testConfig(), hub)
 		req, _ := createMultipartRequest(map[string]string{"title": "Test Image"}, "", nil)
 		w := httptest.NewRecorder()
 
@@ -196,8 +218,10 @@ func TestServer_UploadImage(t *testing.T) {
 		imageRepo.On("Add", mock.AnythingOfType("models.Image")).Return(nil)
 		fileRepo := &MockFileRepository{}
 		fileRepo.On("Save", mock.Anything).Return("/uploads/abc123.jpg", nil)
+		hub := &MockBroadcaster{}
+		hub.On("Broadcast", mock.AnythingOfType("models.Image")).Return(true)
 
-		server := NewServer(imageRepo, fileRepo, testConfig())
+		server := NewServer(imageRepo, fileRepo, testConfig(), hub)
 		req, _ := createMultipartRequest(map[string]string{"title": "My Image", "tags": "nature, sunset"}, "test.jpg", []byte("fake image"))
 		w := httptest.NewRecorder()
 
@@ -206,6 +230,7 @@ func TestServer_UploadImage(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, w.Code)
 		fileRepo.AssertCalled(t, "Save", mock.Anything)
 		imageRepo.AssertCalled(t, "Add", mock.AnythingOfType("models.Image"))
+		hub.AssertCalled(t, "Broadcast", mock.AnythingOfType("models.Image"))
 
 		var response models.Image
 		err := json.Unmarshal(w.Body.Bytes(), &response)
@@ -220,8 +245,9 @@ func TestServer_UploadImage(t *testing.T) {
 		imageRepo := &MockImageRepository{}
 		fileRepo := &MockFileRepository{}
 		fileRepo.On("Save", mock.Anything).Return("", errors.New("disk full"))
+		hub := &MockBroadcaster{}
 
-		server := NewServer(imageRepo, fileRepo, testConfig())
+		server := NewServer(imageRepo, fileRepo, testConfig(), hub)
 		req, _ := createMultipartRequest(map[string]string{"title": "My Image"}, "test.jpg", []byte("fake image"))
 		w := httptest.NewRecorder()
 
@@ -236,8 +262,9 @@ func TestServer_UploadImage(t *testing.T) {
 		imageRepo.On("Add", mock.AnythingOfType("models.Image")).Return(errors.New("db error"))
 		fileRepo := &MockFileRepository{}
 		fileRepo.On("Save", mock.Anything).Return("/uploads/abc123.jpg", nil)
+		hub := &MockBroadcaster{}
 
-		server := NewServer(imageRepo, fileRepo, testConfig())
+		server := NewServer(imageRepo, fileRepo, testConfig(), hub)
 		req, _ := createMultipartRequest(map[string]string{"title": "My Image"}, "test.jpg", []byte("fake image"))
 		w := httptest.NewRecorder()
 

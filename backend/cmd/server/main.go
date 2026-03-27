@@ -7,6 +7,7 @@ import (
 	"anonygram/internal/api"
 	"anonygram/internal/config"
 	"anonygram/internal/storage"
+	"anonygram/internal/ws"
 )
 
 func main() {
@@ -19,7 +20,10 @@ func main() {
 		log.Fatalf("Failed to initialize file store: %v", err)
 	}
 
-	server := api.NewServer(imageRepo, fileRepo, configs)
+	hub := ws.NewHub(configs)
+	go hub.Run()
+
+	server := api.NewServer(imageRepo, fileRepo, configs, hub)
 
 	handler := server.Routes()
 
