@@ -18,13 +18,16 @@ export default function useImages() {
     loadImages();
   }, [loadImages]);
 
+  const addImage = useCallback((image: Image) => {
+    setImages((prev) => {
+      if (prev.some((img) => img.id === image.id)) return prev;
+      return [image, ...prev];
+    });
+  }, []);
+
   const postImage = async (title: string, tags: string[], file: File) => {
-    try {
-      const newImage = await uploadImage(title, tags, file);
-      setImages((prev) => [newImage, ...prev]);
-    } catch (error) {
-      console.error("Error uploading image:", error);
-    }
+    const newImage = await uploadImage(title, tags, file);
+    addImage(newImage);
   };
 
   const addFilter = (tag: string) => {
@@ -37,5 +40,5 @@ export default function useImages() {
     setFilters((prev) => prev.filter((t) => t !== tag));
   };
 
-  return { images, filters, postImage, addFilter, removeFilter };
+  return { images, filters, postImage, addImage, addFilter, removeFilter };
 }
