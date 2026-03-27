@@ -20,3 +20,9 @@ cd frontend
 npm install
 npm run dev
 ``` 
+
+### Running with Docker
+
+```bash
+docker compose up --build
+```
