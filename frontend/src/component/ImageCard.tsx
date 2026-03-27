@@ -11,7 +11,7 @@ export default function ImageCard({ image, onTagClick }: ImageCardProps) {
   return (
     <ThemedView variant="card" className="rounded p-4">
       <img
-        src={imageUrl(image.url)}
+        src={imageUrl(image.filename)}
         alt={image.title}
         className="h-80 mb-2 mx-auto"
       />

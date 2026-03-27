@@ -2,6 +2,6 @@ export type Image = {
   id: string;
   title: string;
   tags: string[];
-  url: string;
+  filename: string;
   createdAt: string;
 };

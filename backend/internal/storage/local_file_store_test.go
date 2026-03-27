@@ -33,12 +33,12 @@ func TestLocalFileStore_Save(t *testing.T) {
 		content := []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52}
 		src := bytes.NewReader(content)
 
-		path, err := fileStore.Save(src)
+		filename, err := fileStore.Save(src)
 		assert.NoError(t, err)
-		assert.Equal(t, ".png", filepath.Ext(path))
-		assert.FileExists(t, path)
+		assert.Equal(t, ".png", filepath.Ext(filename))
+		assert.FileExists(t, filepath.Join(tempDir, filename))
 
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(filepath.Join(tempDir, filename))
 		assert.NoError(t, err)
 		assert.Equal(t, content, data)
 	})
@@ -48,12 +48,12 @@ func TestLocalFileStore_Save(t *testing.T) {
 		content := []byte{0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01}
 		src := bytes.NewReader(content)
 
-		path, err := fileStore.Save(src)
+		filename, err := fileStore.Save(src)
 		assert.NoError(t, err)
-		assert.Equal(t, ".jpg", filepath.Ext(path))
-		assert.FileExists(t, path)
+		assert.Equal(t, ".jpg", filepath.Ext(filename))
+		assert.FileExists(t, filepath.Join(tempDir, filename))
 
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(filepath.Join(tempDir, filename))
 		assert.NoError(t, err)
 		assert.Equal(t, content, data)
 	})
@@ -63,12 +63,12 @@ func TestLocalFileStore_Save(t *testing.T) {
 		content := []byte{0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x01, 0x00, 0x01, 0x00}
 		src := bytes.NewReader(content)
 
-		path, err := fileStore.Save(src)
+		filename, err := fileStore.Save(src)
 		assert.NoError(t, err)
-		assert.Equal(t, ".gif", filepath.Ext(path))
-		assert.FileExists(t, path)
+		assert.Equal(t, ".gif", filepath.Ext(filename))
+		assert.FileExists(t, filepath.Join(tempDir, filename))
 
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(filepath.Join(tempDir, filename))
 		assert.NoError(t, err)
 		assert.Equal(t, content, data)
 	})
@@ -77,9 +77,9 @@ func TestLocalFileStore_Save(t *testing.T) {
 		content := []byte{0x00, 0x01, 0x02}
 		src := bytes.NewReader(content)
 
-		path, err := fileStore.Save(src)
+		filename, err := fileStore.Save(src)
 		assert.Error(t, err)
-		assert.Empty(t, path)
+		assert.Empty(t, filename)
 		assert.Contains(t, err.Error(), "unsupported file type")
 	})
 }

@@ -64,7 +64,7 @@ func (s *Server) UploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 	defer func() { _ = file.Close() }()
 
-	url, err := s.fileRepo.Save(file)
+	filename, err := s.fileRepo.Save(file)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, ErrFileSaveFailed.Error())
 		return
@@ -74,7 +74,7 @@ func (s *Server) UploadImage(w http.ResponseWriter, r *http.Request) {
 		ID:        uuid.New().String(),
 		Title:     title,
 		Tags:      tags,
-		URL:       url,
+		Filename:  filename,
 		CreatedAt: time.Now(),
 	}
 

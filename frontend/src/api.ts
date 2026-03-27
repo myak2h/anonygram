@@ -50,6 +50,6 @@ async function handleErrorResponse(response: Response): Promise<never> {
   throw new Error(message);
 }
 
-export function imageUrl(path: string): string {
-  return `${API_BASE_URL}/${path}`;
+export function imageUrl(filename: string): string {
+  return `${API_BASE_URL}/files/${filename}`;
 }

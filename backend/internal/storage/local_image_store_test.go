@@ -22,7 +22,7 @@ func TestLocalImageStore_Add(t *testing.T) {
 		ID:        "test-id",
 		Title:     "Test Image",
 		Tags:      []string{"tag1", "tag2"},
-		URL:       "/uploads/test-id.jpg",
+		Filename:  "test-id.jpg",
 		CreatedAt: time.Now(),
 	}
 
@@ -40,7 +40,7 @@ func TestLocalImageStore_List(t *testing.T) {
 		ID:        "test-id-1",
 		Title:     "Test Image 1",
 		Tags:      []string{"tag1", "tag2"},
-		URL:       "/uploads/test-id-1.jpg",
+		Filename:  "test-id-1.jpg",
 		CreatedAt: time.Now().Add(-time.Hour),
 	}
 
@@ -48,7 +48,7 @@ func TestLocalImageStore_List(t *testing.T) {
 		ID:        "test-id-2",
 		Title:     "Test Image 2",
 		Tags:      []string{"tag2", "tag3"},
-		URL:       "/uploads/test-id-2.jpg",
+		Filename:  "test-id-2.jpg",
 		CreatedAt: time.Now(),
 	}
 

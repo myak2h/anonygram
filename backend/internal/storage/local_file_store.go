@@ -49,7 +49,7 @@ func (s *LocalFileStore) Save(src io.Reader) (string, error) {
 		return "", err
 	}
 
-	return destPath, nil
+	return filename, nil
 }
 
 func detectFileType(src io.Reader) ([]byte, string, error) {

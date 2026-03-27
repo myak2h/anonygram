@@ -6,6 +6,6 @@ type Image struct {
 	ID        string    `json:"id"`
 	Title     string    `json:"title"`
 	Tags      []string  `json:"tags"`
-	URL       string    `json:"url"`
+	Filename  string    `json:"filename"`
 	CreatedAt time.Time `json:"createdAt"`
 }

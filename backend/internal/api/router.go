@@ -23,7 +23,7 @@ func (s *Server) Routes() http.Handler {
 
 	// Static file serving
 	fileServer := http.FileServer(http.Dir(s.config.UploadPath))
-	r.Handle("/uploads/*", http.StripPrefix("/uploads/", fileServer))
+	r.Handle("/files/*", http.StripPrefix("/files/", fileServer))
 
 	// WebSocket route
 	r.Get("/ws", s.hub.HandleWebSocket)

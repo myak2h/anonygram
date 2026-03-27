@@ -214,7 +214,7 @@ func TestServer_UploadImage(t *testing.T) {
 		imageRepo := &MockImageRepository{}
 		imageRepo.On("Add", mock.AnythingOfType("models.Image")).Return(nil)
 		fileRepo := &MockFileRepository{}
-		fileRepo.On("Save", mock.Anything).Return("/uploads/abc123.jpg", nil)
+		fileRepo.On("Save", mock.Anything).Return("abc123.jpg", nil)
 		hub := &MockBroadcaster{}
 		hub.On("Broadcast", mock.AnythingOfType("models.Image")).Return(true)
 
@@ -234,7 +234,7 @@ func TestServer_UploadImage(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "My Image", response.Title)
 		assert.Equal(t, []string{"nature", "sunset"}, response.Tags)
-		assert.Equal(t, "/uploads/abc123.jpg", response.URL)
+		assert.Equal(t, "abc123.jpg", response.Filename)
 		assert.NotEmpty(t, response.ID)
 	})
 
@@ -258,7 +258,7 @@ func TestServer_UploadImage(t *testing.T) {
 		imageRepo := &MockImageRepository{}
 		imageRepo.On("Add", mock.AnythingOfType("models.Image")).Return(errors.New("db error"))
 		fileRepo := &MockFileRepository{}
-		fileRepo.On("Save", mock.Anything).Return("/uploads/abc123.jpg", nil)
+		fileRepo.On("Save", mock.Anything).Return("abc123.jpg", nil)
 		hub := &MockBroadcaster{}
 
 		server := NewServer(imageRepo, fileRepo, testConfig(), hub)
