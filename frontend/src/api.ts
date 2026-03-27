@@ -25,7 +25,7 @@ export async function uploadImage(
   formData.append("tags", tags.join(","));
   formData.append("image", file);
 
-  const response = await fetch(`${API_BASE_URL}/upload`, {
+  const response = await fetch(`${API_BASE_URL}/uploads`, {
     method: "POST",
     body: formData,
   });

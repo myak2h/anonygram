@@ -19,7 +19,7 @@ func (s *Server) Routes() http.Handler {
 
 	// API routes
 	r.Get("/images", s.ListImages)
-	r.Post("/upload", s.UploadImage)
+	r.Post("/uploads", s.UploadImage)
 
 	// Static file serving
 	fileServer := http.FileServer(http.Dir(s.config.UploadPath))

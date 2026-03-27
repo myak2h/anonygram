@@ -90,7 +90,7 @@ func createMultipartRequest(fields map[string]string, fileName string, fileConte
 
 	_ = writer.Close()
 
-	req, err := http.NewRequest("POST", "/upload", body)
+	req, err := http.NewRequest("POST", "/uploads", body)
 	if err != nil {
 		return nil, err
 	}
