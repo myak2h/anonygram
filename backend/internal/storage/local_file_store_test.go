@@ -7,9 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
 )
-
 
 func TestNewLocalFileStore(t *testing.T) {
 	tempDir := t.TempDir()
@@ -18,12 +16,11 @@ func TestNewLocalFileStore(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.NotNil(t, store)
-	
+
 	info, err := os.Stat(basePath)
 	assert.NoError(t, err)
 	assert.True(t, info.IsDir())
 }
-
 
 func TestLocalFileStore_Save(t *testing.T) {
 	tempDir := t.TempDir()
@@ -32,18 +29,18 @@ func TestLocalFileStore_Save(t *testing.T) {
 
 	t.Run("Save PNG file", func(t *testing.T) {
 
-	// PNG file header bytes
-	content := []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52}
-	src := bytes.NewReader(content)
+		// PNG file header bytes
+		content := []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52}
+		src := bytes.NewReader(content)
 
-	path, err := fileStore.Save(src)
-	assert.NoError(t, err)
-	assert.Equal(t, ".png", filepath.Ext(path))
-	assert.FileExists(t, path)
+		path, err := fileStore.Save(src)
+		assert.NoError(t, err)
+		assert.Equal(t, ".png", filepath.Ext(path))
+		assert.FileExists(t, path)
 
-	data, err := os.ReadFile(path)
-	assert.NoError(t, err)
-	assert.Equal(t, content, data)
+		data, err := os.ReadFile(path)
+		assert.NoError(t, err)
+		assert.Equal(t, content, data)
 	})
 
 	t.Run("Save JPEG file", func(t *testing.T) {

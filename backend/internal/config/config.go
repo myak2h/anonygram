@@ -7,24 +7,23 @@ import (
 	"anonygram/internal/utils"
 )
 
-
 type Config struct {
-	UploadPath string
-	MaxUploadSize int64
-	AllowedOrigins []string
-	Port string
+	UploadPath       string
+	MaxUploadSize    int64
+	AllowedOrigins   []string
+	Port             string
 	ClientBufferSize int
-	HubBufferSize int
+	HubBufferSize    int
 }
 
 func Load() *Config {
 	return &Config{
-		UploadPath: getEnv("UPLOAD_PATH", "./uploads"),
-		MaxUploadSize: getEnvInt64("MAX_UPLOAD_SIZE", 10 << 20), // default 10 MB
-		AllowedOrigins: getEnvSlice("ALLOWED_ORIGINS", "*"),
-		Port: getEnv("PORT", "8080"),
+		UploadPath:       getEnv("UPLOAD_PATH", "./uploads"),
+		MaxUploadSize:    getEnvInt64("MAX_UPLOAD_SIZE", 10<<20), // default 10 MB
+		AllowedOrigins:   getEnvSlice("ALLOWED_ORIGINS", "*"),
+		Port:             getEnv("PORT", "8080"),
 		ClientBufferSize: getEnvInt("CLIENT_BUFFER_SIZE", 256),
-		HubBufferSize: getEnvInt("HUB_BUFFER_SIZE", 16),
+		HubBufferSize:    getEnvInt("HUB_BUFFER_SIZE", 16),
 	}
 }
 
@@ -57,4 +56,3 @@ func getEnvSlice(key, defaultValue string) []string {
 	value := getEnv(key, defaultValue)
 	return utils.SplitAndTrim(value, ",")
 }
-

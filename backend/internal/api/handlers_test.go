@@ -1,22 +1,20 @@
 package api
 
-
-import (	
+import (
 	"bytes"
+	"encoding/json"
 	"errors"
+	"io"
 	"mime/multipart"
 	"net/http"
-	"testing"
-	"io"
 	"net/http/httptest"
-	"encoding/json"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"anonygram/internal/models"
 	"anonygram/internal/config"
-
+	"anonygram/internal/models"
 )
 
 // Mocks
@@ -154,7 +152,7 @@ func TestServer_ListImages(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, w.Code)
 		imageRepo.AssertCalled(t, "List", []string(nil))
-		
+
 		responseImages := []models.Image{}
 		err := json.Unmarshal(w.Body.Bytes(), &responseImages)
 		assert.NoError(t, err)
@@ -180,7 +178,6 @@ func TestServer_ListImages(t *testing.T) {
 		imageRepo.AssertCalled(t, "List", []string{"nature", "sunset"})
 	})
 }
-
 
 func TestServer_UploadImage(t *testing.T) {
 	t.Run("missing title", func(t *testing.T) {

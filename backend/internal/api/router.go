@@ -1,11 +1,10 @@
 package api
 
 import (
-	"net/http"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-
+	"net/http"
 )
 
 func (s *Server) Routes() http.Handler {
@@ -15,7 +14,7 @@ func (s *Server) Routes() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   s.config.AllowedOrigins,
+		AllowedOrigins: s.config.AllowedOrigins,
 	}))
 
 	// API routes

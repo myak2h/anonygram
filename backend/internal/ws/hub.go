@@ -91,7 +91,6 @@ func (h *Hub) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	go client.readPump()
 }
 
-
 func (h *Hub) Broadcast(img models.Image) bool {
 	select {
 	case h.broadcast <- img:
@@ -100,4 +99,3 @@ func (h *Hub) Broadcast(img models.Image) bool {
 		return false
 	}
 }
-

@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-
 // Helpers
 
 type testEnv struct {
@@ -32,7 +31,7 @@ func setupTestEnv(t *testing.T) *testEnv {
 	wsURL := "ws" + server.URL[4:] + "/ws"
 	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	require.NoError(t, err)
-	t.Cleanup(func() { conn.Close() })
+	t.Cleanup(func() { _ = conn.Close() })
 
 	time.Sleep(50 * time.Millisecond)
 	return &testEnv{hub: hub, server: server, conn: conn}
@@ -75,7 +74,7 @@ func TestClient_WritePump_SendsMessages(t *testing.T) {
 	testMsg := []byte(`{"test": "message"}`)
 	client.send <- testMsg
 
-	env.conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+	_ = env.conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 	_, message, err := env.conn.ReadMessage()
 	require.NoError(t, err)
 	assert.Equal(t, testMsg, message)
@@ -85,7 +84,7 @@ func TestClient_ReadPump_UnregistersOnClose(t *testing.T) {
 	env := setupTestEnv(t)
 	assert.Len(t, env.hub.clients, 1)
 
-	env.conn.Close()
+	_ = env.conn.Close()
 	time.Sleep(100 * time.Millisecond)
 
 	assert.Len(t, env.hub.clients, 0)
@@ -95,8 +94,8 @@ func TestClient_ReadPump_HandlesReadError(t *testing.T) {
 	env := setupTestEnv(t)
 	assert.Len(t, env.hub.clients, 1)
 
-	env.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-	env.conn.Close()
+	_ = env.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+	_ = env.conn.Close()
 	time.Sleep(100 * time.Millisecond)
 
 	assert.Len(t, env.hub.clients, 0)
@@ -109,7 +108,7 @@ func TestClient_WritePump_ClosesOnSendClose(t *testing.T) {
 	client.closeSend()
 	time.Sleep(50 * time.Millisecond)
 
-	env.conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
+	_ = env.conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
 	_, _, err := env.conn.ReadMessage()
 	assert.Error(t, err)
 }

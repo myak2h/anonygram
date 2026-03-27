@@ -1,13 +1,12 @@
-package storage 
+package storage
 
 import (
-	"sync"
 	"sort"
 	"strings"
+	"sync"
 
 	"anonygram/internal/models"
 )
-
 
 type LocalImageStore struct {
 	mu     sync.RWMutex
@@ -36,9 +35,9 @@ func (s *LocalImageStore) List(tags []string) []models.Image {
 	}
 	imagesCopy := make([]models.Image, len(s.images))
 	copy(imagesCopy, s.images)
-	s.mu.RUnlock()	
+	s.mu.RUnlock()
 
-	if(len(tags) == 0) {
+	if len(tags) == 0 {
 		sortImages(imagesCopy)
 		return imagesCopy
 	}
@@ -54,7 +53,7 @@ func (s *LocalImageStore) List(tags []string) []models.Image {
 		for _, tag := range img.Tags {
 			if _, ok := tagSet[normalizeTag(tag)]; ok {
 				filteredImages = append(filteredImages, img)
-				break 
+				break
 			}
 		}
 	}
@@ -72,5 +71,3 @@ func sortImages(images []models.Image) {
 		return images[i].CreatedAt.After(images[j].CreatedAt)
 	})
 }
-
-

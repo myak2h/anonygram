@@ -20,9 +20,9 @@ import (
 
 func newTestConfig() *config.Config {
 	return &config.Config{
-		AllowedOrigins: []string{"*"},
+		AllowedOrigins:   []string{"*"},
 		ClientBufferSize: 256,
-		HubBufferSize: 16,
+		HubBufferSize:    16,
 	}
 }
 
@@ -130,7 +130,6 @@ func TestHub_ConcurrentOperations(t *testing.T) {
 	time.Sleep(50 * time.Millisecond)
 	assert.Len(t, hub.clients, 0)
 
-
 	client := registerClient(t, hub, 1000)
 	for i := 0; i < 100; i++ {
 		wg.Add(1)
@@ -155,14 +154,14 @@ func TestHub_HandleWebSocket_Integration(t *testing.T) {
 	wsURL := "ws" + server.URL[4:] + "/ws"
 	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	require.NoError(t, err)
-	t.Cleanup(func() { conn.Close() })
+	t.Cleanup(func() { _ = conn.Close() })
 
 	time.Sleep(50 * time.Millisecond)
 	assert.Len(t, hub.clients, 1)
 
 	hub.Broadcast(models.Image{ID: "ws-test", Title: "WebSocket Test"})
 
-	conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+	_ = conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 	_, message, err := conn.ReadMessage()
 	require.NoError(t, err)
 

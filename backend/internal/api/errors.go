@@ -2,14 +2,11 @@ package api
 
 import "errors"
 
-
 var (
-	ErrTitleRequired      = errors.New("Title is required")
-	ErrImageFileRequired  = errors.New("Image file is required")
-	ErrInvalidFormData    = errors.New("Invalid form data")
-	ErrFileTooLarge       = errors.New("File is too large")
-	ErrFileSaveFailed     = errors.New("Failed to save image file")
-	ErrMetadataSaveFailed = errors.New("Failed to save image metadata")
+	ErrTitleRequired      = errors.New("title is required")
+	ErrImageFileRequired  = errors.New("image file is required")
+	ErrInvalidFormData    = errors.New("invalid form data")
+	ErrFileTooLarge       = errors.New("file is too large")
+	ErrFileSaveFailed     = errors.New("failed to save image file")
+	ErrMetadataSaveFailed = errors.New("failed to save image metadata")
 )
-
-

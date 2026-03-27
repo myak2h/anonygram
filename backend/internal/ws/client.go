@@ -20,7 +20,7 @@ func (c *Client) closeSend() {
 }
 
 func (c *Client) writePump() {
-	defer c.conn.Close()
+	defer func() { _ = c.conn.Close() }()
 	for msg := range c.send {
 		if err := c.conn.WriteMessage(websocket.TextMessage, msg); err != nil {
 			return
@@ -31,7 +31,7 @@ func (c *Client) writePump() {
 func (c *Client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
-		c.conn.Close()
+		_ = c.conn.Close()
 	}()
 	for {
 		if _, _, err := c.conn.ReadMessage(); err != nil {
